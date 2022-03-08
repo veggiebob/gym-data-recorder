@@ -4,9 +4,25 @@ from math import floor
 from dataclasses import dataclass
 from typing import Callable
 
+# DEFINING MY OWN SPEC FOR DAYS
+# DAYS START AT 0 BOZO AND END AT 6
+# BECAUSE GOD CREATED THE EARTH
+# WITH 6 DAYS BECAUSE 6 IS A PERFECT NUMBER
+DAYS = [
+		'Sunday',
+		'Monday',
+		'Tuesday',
+		'Wednesday',
+		'Thursday',
+		'Friday',
+		'Saturday'
+	]
+def string_day(day: int) -> str:
+	return DAYS[day]
 
 @dataclass
 class Point:
+	# week, day, ftime
 	time: tuple[int, int, float]
 	gym: int
 	pool: int
@@ -19,6 +35,9 @@ class Point:
 
 	def day(self) -> int:
 		return self.time[1]
+
+	def week(self) -> int:
+		return self.time[0]
 
 	def __lt__(self, other):
 		if type(other) == str:
@@ -48,11 +67,33 @@ def _pad_0(n: int) -> str:
 Hour = int
 Minute = int
 Second = int
+
+# float representing time of day between 0 and 1
+fTime = float
+
+def to_ftime(time: (Hour, Minute, Second)) -> fTime:
+	(hour, minute, second) = time
+	return (hour + (minute + second / 60) / 60) / 24
+
 def unpack_time(time: float) -> (Hour, Minute, Second):
 	hour = floor(time * 24)
-	minute = floor(time * 24 * 60) % 24
+	minute = floor(time * 24 * 60) % 60
 	second = floor(time * 24 * 60 * 60) % 60
 	return hour, minute, second
+
+# d stands for delta
+def add_time(time: float, d: (Hour, Minute, Second)) -> fTime:
+	(hr, m, s) = unpack_time(time)
+	s += d[2]
+	while s > 60:
+		m += 1
+		s -= 60
+	m += d[1]
+	while m > 60:
+		hr += 1
+		m -= 60
+	hr = (hr + d[0]) % 24
+	return to_ftime((hr, m, s))
 
 # inverse of parse_time
 def string_time(time: float) -> str:
@@ -63,10 +104,12 @@ def parse_data(file) -> list[Point]:
 	lines = []
 	for line in file:
 		params = line.split(',')
-		if len(params) < 5:
-			print('skipped one!')
+		if len(params) < 6:
+			print(f'"{line}" does not have enough parameters! skipping!')
 			continue
-		time = (int(params[0]), int(params[1]), parse_time(params[2]))
+
+		# bozo days
+		time = (int(params[0]), int(params[1]) - 1, parse_time(params[2]))
 		upper = int(params[3])
 		lower = int(params[4])
 		pool = int(params[5])
@@ -87,31 +130,54 @@ def last_gym_point(day_data: list[Point]) -> Point:
 	f.sort()
 	return f[-1]
 
-def summarize(data: list[Point], buckets_per_hour: int, f: PointFilter) -> list[int]:
+# given all the data and a function to filter it (with bucket sizes)
+# group data points into buckets and average them, and return them as a list of points
+def summarize(data: list[Point], buckets_per_hour: int, f: PointFilter) -> list[dict]:
 
 	h = list(filter(f, data))
 	h.sort(key=Point.gtime)
 
-	bph = buckets_per_hour
-	b_len = 60 / bph # bucket length (in minutes)
-	day_len = (bph * 24)
+	bph = buckets_per_hour 				# buckets / hour
+	b_len = 60 / bph 					# minutes / bucket
+	day_len = (bph * 24) 				# buckets / day 
 	buckets = [(0, 0)] * day_len * 7
 
 	for point in h:
 		(hour, minute, _) = unpack_time(point.ftime())
 		i = point.day() * day_len + \
 			hour * bph + \
-			floor(minute / b_len) * bph
+			floor(minute / b_len)
 		(total, count) = buckets[i]
+		# assume that we only want the points from the gym
 		buckets[i] = (total + point.gym, count + 1)
 
+	# do the average calculation
 	buckets = list(map(lambda tup: tup[0] / tup[1] if tup[1] > 0 else 0, buckets))
+	
+	# create the simple points
+	f_minute = to_ftime((0, 1, 0))
+	for i in range(len(buckets)):
+		buckets[i] = {
+			'x': i * f_minute * b_len,
+			'y': buckets[i]
+		}
+
 	return buckets
 
-if __name__ == '__main__':
+
+def main():
 	args = sys.argv
 	# print(args)
+	if len(args) < 2:
+		print("need at least 1 argument! filename!")
+		return
 	with open(args[1]) as f:
 		data = parse_data(f)
-		print('[%s]'%','.join(list(map(lambda i:str(i), summarize(data, 6, lambda _: True)))))
+		# print('[%s]'%','.join(list(map(lambda i:str(i), summarize(data, 6, lambda _: True)))))
+		summary = summarize(data, 6, lambda _: True)
+		s = f"[{','.join(list(map(str, summary)))}]"
+		print("%s", s)
 
+
+if __name__ == '__main__':
+	main()
