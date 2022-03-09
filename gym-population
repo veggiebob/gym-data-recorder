@@ -1,9 +1,13 @@
 #!/bin/bash
 
+if [[ -z "${PYTHON_EXEC}" ]]; then
+    echo "PYTHON_EXEC being set to 'python'"
+    export PYTHON_EXEC="python"
+fi
 
 # stolen from stack overflow
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 (
 cd $SCRIPT_DIR
-python3.9 parse_output.py output.csv
+$PYTHON_EXEC parse_output.py output.csv
 )
