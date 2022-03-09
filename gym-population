@@ -7,6 +7,7 @@ fi
 
 # stolen from stack overflow
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 (
 cd $SCRIPT_DIR
 $PYTHON_EXEC parse_output.py output.csv

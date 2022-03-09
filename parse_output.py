@@ -2,7 +2,7 @@ import sys
 import re
 from math import floor
 from dataclasses import dataclass
-from typing import Callable
+from typing import *
 
 # DEFINING MY OWN SPEC FOR DAYS
 # DAYS START AT 0 BOZO AND END AT 6
@@ -23,7 +23,7 @@ def string_day(day: int) -> str:
 @dataclass
 class Point:
 	# week, day, ftime
-	time: tuple[int, int, float]
+	time: Tuple[int, int, float]
 	gym: int
 	pool: int
 
@@ -100,7 +100,7 @@ def string_time(time: float) -> str:
 	(hour, minute, second) = unpack_time(time)
 	return _pad_0(hour) + ':' + _pad_0(minute) + ':' + _pad_0(second)
 
-def parse_data(file) -> list[Point]:
+def parse_data(file) -> List[Point]:
 	lines = []
 	for line in file:
 		params = line.split(',')
@@ -116,7 +116,7 @@ def parse_data(file) -> list[Point]:
 		lines.append(Point(time=time, gym=upper + lower, pool=pool))
 	return lines
 
-def by_day(data: list[Point]) -> dict[int, list[Point]]:
+def by_day(data: List[Point]) -> Dict[int, List[Point]]:
 	out = {}
 	for d in data:
 		if d.time[1] in out:
@@ -125,14 +125,14 @@ def by_day(data: list[Point]) -> dict[int, list[Point]]:
 			out[d.time[1]] = [d]
 	return out
 
-def last_gym_point(day_data: list[Point]) -> Point:
+def last_gym_point(day_data: List[Point]) -> Point:
 	f = list(filter(lambda b: b < '22:00:00', day_data))
 	f.sort()
 	return f[-1]
 
 # given all the data and a function to filter it (with bucket sizes)
 # group data points into buckets and average them, and return them as a list of points
-def summarize(data: list[Point], buckets_per_hour: int, f: PointFilter) -> list[dict]:
+def summarize(data: List[Point], buckets_per_hour: int, f: PointFilter) -> List[dict]:
 
 	h = list(filter(f, data))
 	h.sort(key=Point.gtime)
