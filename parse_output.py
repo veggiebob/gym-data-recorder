@@ -105,7 +105,7 @@ def parse_data(file) -> list[Point]:
 	for line in file:
 		params = line.split(',')
 		if len(params) < 6:
-			print(f'"{line}" does not have enough parameters! skipping!')
+			# print(f'"{line}" does not have enough parameters! skipping!')
 			continue
 
 		# bozo days
@@ -168,6 +168,7 @@ def summarize(data: list[Point], buckets_per_hour: int, f: PointFilter) -> list[
 def main():
 	args = sys.argv
 	# print(args)
+	# print('args are ', args)
 	if len(args) < 2:
 		print("need at least 1 argument! filename!")
 		return
@@ -175,8 +176,8 @@ def main():
 		data = parse_data(f)
 		# print('[%s]'%','.join(list(map(lambda i:str(i), summarize(data, 6, lambda _: True)))))
 		summary = summarize(data, 6, lambda _: True)
-		s = f"[{','.join(list(map(str, summary)))}]"
-		print("%s", s)
+		s = f"[%s]"%(','.join(list(map(lambda d: "{\"x\":%.3f,\"y\":%.3f}"%(d['x'],d['y']), summary))))
+		print("{\"week_mode\":true,\"data\":%s}"%s)
 
 
 if __name__ == '__main__':
