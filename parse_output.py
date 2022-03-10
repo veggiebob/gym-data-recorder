@@ -175,7 +175,7 @@ def main():
 	with open(args[1]) as f:
 		data = parse_data(f)
 		# print('[%s]'%','.join(list(map(lambda i:str(i), summarize(data, 6, lambda _: True)))))
-		summary = summarize(data, 6, lambda _: True)
+		summary = summarize(data, 2, lambda _: True)
 		s = f"[%s]"%(','.join(list(map(lambda d: "{\"x\":%.3f,\"y\":%.3f}"%(d['x'],d['y']), summary))))
 		print("{\"week_mode\":true,\"data\":%s}"%s)
 
