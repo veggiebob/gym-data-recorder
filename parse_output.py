@@ -13,10 +13,6 @@ import fetch_data
 # DAYS START AT 0 BOZO AND END AT 6
 # BECAUSE GOD CREATED THE EARTH
 # WITH 6 DAYS BECAUSE 6 IS A PERFECT NUMBER
-@dataclass
-class Point:
-	x: float
-	y: float
 
 def day_ftime(time):
 	return (time.hour + (time.minute + time.second / 60) / 60) / 24
