@@ -1,12 +1,12 @@
 #!/bin/bash
 
 if [[ -z "${PYTHON_EXEC}" ]]; then
-  echo "PYTHON_EXEC being set to 'python'"
+  echo "PYTHON_EXEC being set to 'python'" 1>&2
   export PYTHON_EXEC="python"
 fi
 
 if [[ -z "${GYM_POP_SOURCE}" ]]; then
-  echo "GYM_POP_SOURCE being set to 'output_pd.csv'"
+  echo "GYM_POP_SOURCE being set to 'output_pd.csv'" 1>&2
   export GYM_POP_SOURCE="output_pd.csv"
 fi
 
