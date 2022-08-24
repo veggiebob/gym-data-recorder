@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 import datetime
+import pandas as pd
 
 CSV_NAME = 'output_pd.csv'
 DAYOFWEEK_INDEX = { i: day for i, day in zip(range(7), ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']) }
@@ -23,7 +24,7 @@ def get_row():
     '''
     Returns a row of GYM data AND a TIMESTAMP
     '''
-    lower, upper, aquatic = get_data()
+    lower, upper, aquatic = get_current_gym_data()
     t = get_time()
     row = dict(lower=lower,
                upper=upper,
@@ -32,22 +33,22 @@ def get_row():
                day=t.weekday())
     return row
 
-def read_csv_data():
+def read_csv_data(filename=CSV_NAME):
     '''
     Returns the currently existing data, or an empty table with the columns
     '''
     try:
-        data = pd.read_csv(csv_name)
+        data = pd.read_csv(filename)
         data.time = pd.to_datetime(data.time)
         return data
     except:
         return pd.DataFrame(columns=['time', 'lower', 'upper', 'aquatic', 'day'])
 
-def save_data(data):
+def save_data(data, filename=CSV_NAME):
     '''
     Save the data
     '''
-    data.to_csv(CSV_NAME, index=False)
+    data.to_csv(filename, index=False)
     
 def add_datapoint(data):
     '''
