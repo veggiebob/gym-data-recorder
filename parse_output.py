@@ -20,11 +20,13 @@ class Point:
 
 def day_ftime(time):
 	return (time.hour + (time.minute + time.second / 60) / 60) / 24
+
+
 def summarize(data: pd.DataFrame):
 
 	ps = []
 	for (idx, r) in data.iterrows():
-		print(r)
+		# print(r)
 		p = dict(x=r.day + day_ftime(r.time.time()),
 				 y=r.lower + r.upper)
 		ps.append(p)
@@ -32,8 +34,8 @@ def summarize(data: pd.DataFrame):
 
 def main():
 	args = sys.argv
-	print(args)
-	print('args are ', args)
+	# print(args)
+	# print('args are ', args)
 	if len(args) < 2:
 		print("Need at least 1 argument! filename!")
 		return
