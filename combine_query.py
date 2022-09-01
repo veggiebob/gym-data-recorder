@@ -3,13 +3,13 @@ def combine_by_week(data, hour_bins=24, minute_bins=60):
     week_binner = vectorize(lambda t: get_week_time_bin(t, hour_bins=hour_bins, minute_bins=minute_bins))
     d = data.copy()
     d['week_bin'] = week_binner(d.time)
-    return d.group_by(by='week_bin').mean(numeric_only=False)
+    return d.groupby(by='week_bin').mean(numeric_only=False)
     
 def combine_by_day(data, minute_bins=60):
     day_binner = vectorize(lambda t: get_day_time_bin(t, minute_bins=minute_bins))
     d = data.copy()
     d['day_bin'] = day_binner(d.time)
-    return d.group_by(by='day_bin').mean(numeric_only=False)
+    return d.groupby(by='day_bin').mean(numeric_only=False)
 
 def vectorize(f):
     def vector_f(xs):
