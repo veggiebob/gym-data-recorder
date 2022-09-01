@@ -38,7 +38,7 @@ def main():
 		return
 	filename = args[1]
 	data = fetch_data.read_csv_data(filename=filename)
-	data = combine_query.combine_by_week(data, minute_bins=60)
+	data = combine_query.combine_by_week(data, minute_bins=2)
 	summary = summarize(data)
 	summary.sort(key=lambda p: p['x'])
 	# JSON Spec:
