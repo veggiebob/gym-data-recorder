@@ -24,8 +24,8 @@ def summarize(data: pd.DataFrame):
 	ps = []
 	for (idx, r) in data.iterrows():
 		# print(r)
-		p = dict(x=(r.day + day_ftime(r.time.time()), 3),
-				 y=(r.lower + r.upper, 3))
+		p = dict(x=r.day + day_ftime(r.time.time()),
+				 y=r.lower + r.upper)
 		ps.append(p)
 	return ps
 
