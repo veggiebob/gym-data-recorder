@@ -8,6 +8,7 @@ import json
 import pandas as pd
 
 import fetch_data
+import combine_query
 
 # DEFINING MY OWN SPEC FOR DAYS
 # DAYS START AT 0 BOZO AND END AT 6
@@ -37,6 +38,7 @@ def main():
 		return
 	filename = args[1]
 	data = fetch_data.read_csv_data(filename=filename)
+    data = combine_query.combine_by_week(data, minute_bins=3).sort_values(by='time')
 	summary = summarize(data)
 
 	# JSON Spec:
