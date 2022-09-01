@@ -24,8 +24,8 @@ def summarize(data: pd.DataFrame):
 	ps = []
 	for (idx, r) in data.iterrows():
 		# print(r)
-		p = dict(x=r.day + day_ftime(r.time.time()),
-				 y=r.lower + r.upper)
+		p = dict(x=round(r.day + day_ftime(r.time.time()), 3),
+				 y=round(r.lower + r.upper, 3))
 		ps.append(p)
 	return ps
 
@@ -38,9 +38,9 @@ def main():
 		return
 	filename = args[1]
 	data = fetch_data.read_csv_data(filename=filename)
-	data = combine_query.combine_by_week(data, minute_bins=3).sort_values(by='time')
+	data = combine_query.combine_by_week(data, minute_bins=3)
 	summary = summarize(data)
-
+	summary.sort(key=lambda p: p['x'])
 	# JSON Spec:
 	#         {
 	#             week_mode: bool,
@@ -51,7 +51,7 @@ def main():
 	#                 }
 	#             ]
 	#         }
-	s = json.dumps(summary)
+	s = json.dumps(summary, separators=(',', ':'))
 	print("{\"week_mode\":true,\"data\":%s}"%s)
 
 
