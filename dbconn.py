@@ -1,4 +1,5 @@
 import json
+import socket
 from typing import Callable
 
 import psycopg2
@@ -45,10 +46,13 @@ class ConnCursor:
 
 def _default_conn() -> psycopg2.extensions.connection:
     config = json.load(open('env.json'))
+    host = config['host']
+    ipv4 = socket.gethostbyname(host)
     return psycopg2.connect(
+        host=config['host'],
+        hostaddr=ipv4,
         user=config['user'],
         password=config['password'],
-        host=config['host'],
         port=config['port'],
         dbname=config['dbname']
     )
