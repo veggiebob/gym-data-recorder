@@ -13,7 +13,7 @@ def get_current_gym_data():
     website = BeautifulSoup(res.text, 'html.parser')
     num_elements = website.find_all('p', class_='occupancy-count')
     int_data = list(map(lambda elem: int(elem.strong.text), num_elements))
-    data = int_data[0], int_data[2], int_data[4]
+    data = int_data[2], int_data[4], int_data[6]
     return data
 
 def lambda_handler(event, context):
@@ -21,7 +21,7 @@ def lambda_handler(event, context):
     # current_time = datetime.datetime.now()
     # time_with_timezone = current_time.astimezone()
     with get_conn() as cursor:
-        cursor.execute("INSERT INTO gym_occupancy (lower, upper, aquatic, time) VALUES (%s, %s, %s, now())",
+        cursor.execute("INSERT INTO gym_occupancy (lower, upper, aquatic, time_collected) VALUES (%s, %s, %s, now())",
                           (lower, upper, aquatic))
         cursor.connection.commit()
     return {

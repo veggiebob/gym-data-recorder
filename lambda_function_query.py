@@ -33,7 +33,7 @@ def lambda_handler(event, context):
 def get_lower_upper_histogram(buckets: int):
     if buckets < 1:
         raise ValueError("`buckets` must be >= 1")
-
+    timezone = 'America/New_York' # this is where the gym is located
     # 2) build the query with psycopg2.sql
     q = sql.SQL("""
         WITH
@@ -45,8 +45,8 @@ def get_lower_upper_histogram(buckets: int):
           ),
           aggregated AS (
             SELECT
-              extract(dow FROM created_at)::int                               AS day_of_week,
-              floor((extract(epoch FROM time) / 86400.0) * {b})::int          AS bucket,
+              extract(dow FROM (time_collected AT TIME ZONE {tz}))::int                               AS day_of_week,
+              floor((extract(epoch FROM ((time_collected AT TIME ZONE {tz})::time)) / 86400.0) * {b})::int          AS bucket,
               avg(lower)::double precision                                    AS avg_lower,
               avg(upper)::double precision                                    AS avg_upper,
               avg(aquatic)::double precision                                  AS avg_aquatic
@@ -67,6 +67,7 @@ def get_lower_upper_histogram(buckets: int):
         ORDER BY d.day_of_week, b.bucket;
         """).format(
         b=sql.Literal(buckets),
+        tz=sql.Literal(timezone),
     )
 
     # 3) execute and fetch
