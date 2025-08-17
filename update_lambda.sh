@@ -5,7 +5,7 @@ set -euo pipefail
 VENV_DIR=".venv"                # path to your virtualenv
 REQ_FILE="requirements.txt"     # where to freeze deps
 PACKAGE_DIR="lambda-package"           # temp install dir
-DEPLOY_ZIP="gym-data-lambda.zip"     # output zip
+DEPLOY_ZIP="gym-data-sample.zip"     # output zip
 SRC_GLOB="env.json *.py"        # which files to include from CWD
 # ──────────────────────────────────────────────────────────────────────────
 
@@ -29,5 +29,12 @@ echo "🦅 Creating ${DEPLOY_ZIP}"
 pushd "${PACKAGE_DIR}" > /dev/null
 zip -r "../${DEPLOY_ZIP}" . > /dev/null
 popd > /dev/null
+
+echo "📤 Uploading ${DEPLOY_ZIP} to AWS Lambda"
+aws lambda update-function-code --function-name gymDataSample --zip-file fileb://"${DEPLOY_ZIP}"
+if [ $? -ne 0 ]; then
+    echo "❌ Error uploading to Lambda. Please check your AWS credentials and function name."
+    exit 1
+fi
 
 echo "✅ Done! Upload ${DEPLOY_ZIP} to Lambda."

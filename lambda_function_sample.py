@@ -11,10 +11,18 @@ def get_current_gym_data():
     """
     res = requests.get('https://recreation.rit.edu/facilityoccupancy')
     website = BeautifulSoup(res.text, 'html.parser')
-    num_elements = website.find_all('p', class_='occupancy-count')
-    int_data = list(map(lambda elem: int(elem.strong.text), num_elements))
-    data = int_data[2], int_data[4], int_data[6]
-    return data
+    elements = website.find_all('div', class_='occupancy-card')
+    if len(elements) < 3:
+        raise ValueError("Expected at least 3 occupancy cards, found: {}".format(len(elements)))
+    titles = [elem.find('h2').text.lower() for elem in elements]
+    occupancies = [int(elem.find('p', class_='occupancy-count').text) for elem in elements]
+    occupancy_data = { 'lower': 0, 'upper': 0, 'aquatic': 0 }
+    for title, occupancy in zip(titles, occupancies):
+        for key in occupancy_data:
+            if key in title:
+                occupancy_data[key] = occupancy
+                break
+    return occupancy_data['lower'], occupancy_data['upper'], occupancy_data['aquatic']
 
 def lambda_handler(event, context):
     lower, upper, aquatic = get_current_gym_data()

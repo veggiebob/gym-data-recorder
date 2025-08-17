@@ -5,7 +5,7 @@ from typing import Callable
 import psycopg2
 
 
-def get_conn() -> 'ConnCursor':
+def get_conn(cursor_factory=None) -> 'ConnCursor':
     """
     Returns a temporary cursor & connection to the database.
     Using this in a context manager will ensure that the connection and cursor are closed properly after use.
@@ -16,13 +16,13 @@ def get_conn() -> 'ConnCursor':
         for row in results:
             print(row)
     """
-    return ConnCursor(_default_conn)
+    return ConnCursor(_default_conn, cursor_factory=cursor_factory)
 
 
 class ConnCursor:
-    def __init__(self, init_conn: Callable[[], psycopg2.extensions.connection] = None):
+    def __init__(self, init_conn: Callable[[], psycopg2.extensions.connection] = None, cursor_factory=None):
         if init_conn is None:
-            init_conn = _default_conn
+            init_conn = lambda: _default_conn(cursor_factory)
         self.init_conn = init_conn
         self.conn = None
         self.cursor: psycopg2.extensions.cursor = None
@@ -44,7 +44,7 @@ class ConnCursor:
         return False
 
 
-def _default_conn() -> psycopg2.extensions.connection:
+def _default_conn(cursor_factory=None) -> psycopg2.extensions.connection:
     config = json.load(open('env.json'))
     host = config['host']
     ipv4 = socket.gethostbyname(host)
@@ -54,5 +54,6 @@ def _default_conn() -> psycopg2.extensions.connection:
         user=config['user'],
         password=config['password'],
         port=config['port'],
-        dbname=config['dbname']
+        dbname=config['dbname'],
+        cursor_factory=cursor_factory
     )
